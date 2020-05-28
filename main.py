@@ -57,7 +57,7 @@ class Action():
             self.type = 'swap'
             prompt = "Which two players would you like to swap? (comma separated)"
             def get_troublemaker_input(prompt, nick_list, player_id):
-                temp_input = dm_input(player_id, prompt)
+                temp_input = await dm_input(player_id, prompt)
                 input_list = input.split(",")
                 if input_list.length() == 2:
                     input_list[0] = input_list[0].strip()
@@ -78,7 +78,7 @@ class Action():
             self.player_swap_list.append(player.nickname)
             prompt = "Enter a player to steal their role."
             def get_robber_input(prompt, nick_list, player_id):
-                input = dm_input(player_id, prompt)
+                input = await dm_input(player_id, prompt)
                 if input in nick_list:
                     return input
                 else:
@@ -99,14 +99,14 @@ class Action():
         elif player.role == 'seer':
             prompt = "Would you like to see cards (type 'cards') or player (type 'player')?"
             def get_seer_input(prompt):
-                input = dm_input(player.player_id, prompt)
+                input = await dm_input(player.player_id, prompt)
                 if input == 'player':
                     message = 'Input accepted!'
-                    dm_print(player.player_id, message)
+                    await dm_print(player.player_id, message)
                     return 'see_player'
                 elif input == 'cards':
                     message = 'Input accepted!'
-                    dm_print(player.player_id, message)
+                    await dm_print(player.player_id, message)
                     return 'see_cards'
                 else:
                     prompt = "Not a valid option. Please try again."
@@ -126,6 +126,12 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 PREFIX = str(os.getenv('PREFIX'))
+
+def validate_roles(role_list):
+    for i in range(len(role_list)):
+        if role_list[i] not in global_roles:
+            return False
+    return True
 
 
 client = discord.Client()
@@ -152,21 +158,54 @@ async def on_message(message):
         ### 100, 101, and 102 are the middle cards.
         player_ids.extend([100, 101, 102])
 
-        decided = False
-        while(decided == False):
-            ### Role Loop: GM decides which roles are included.
-            roles_str = await dm_input(gm_id, "Role options include: villager, werewolf, mason, troublemaker, robber, seer, drunk, hunter, tanner, minion. Enter comma separated roles you would like to include. Must include {} roles. ".format(len(player_ids)))
-            roles = roles_str.split(',')
-            #global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'robber', 'seer', 'drunk', 'hunter', 'minion']
-            decided_str = await dm_input(gm_id, "Your roles are: {}. Is this ok? (Y/N) ".format(roles))
-            if decided_str == 'Y' and len(roles) == len(player_ids):
-                decided = True
-            elif len(roles) != len(player_ids):
-                await dm_print(gm_id, 'Length of roles given ({}) does not match number of players ({}).'.format(len(roles), len(player_ids)))
+        ### Manual role prompt
+        manual_roles = False
+        manual_role_ask = await dm_input(gm_id, 'Would you like to assign roles manually? (Y/N) ')
+        if manual_role_ask == 'Y':
+            manual_roles = True
+        else:
+            manual_roles = False
+        
+        if manual_roles:
+            decided = False
+            while(decided == False):
+                ### Role Loop: GM decides which roles are included.
+                roles_str = await dm_input(gm_id, "Role options include: villager, werewolf, mason, troublemaker, robber, seer, drunk, hunter, tanner, minion. Enter comma separated roles you would like to include. Must include {} roles. ".format(len(player_ids)))
+                roles_str.replace(' ', '')
+                roles = roles_str.split(',')
+                #global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'robber', 'seer', 'drunk', 'hunter', 'minion']
+                decided_str = await dm_input(gm_id, "Your roles are: {}. Is this ok? (Y/N) ".format(roles))
+                if decided_str == 'Y' and len(roles) == len(player_ids) and validate_roles(roles):
+                    decided = True
+                elif len(roles) != len(player_ids):
+                    await dm_print(gm_id, 'Length of roles given ({}) does not match number of players ({}).'.format(len(roles), len(player_ids)))
+                elif validate_roles(roles) == False:
+                    await dm_print(gm_id, 'Invalid roles.')
 
-        random.shuffle(roles)
+            random.shuffle(roles)
         #player_dict = dict(zip(player_ids, roles))
         nickname_dict = await get_nicks(player_ids)
+        if manual_roles == False:
+            nicknames = list(nickname_dict.values())
+            decided = False
+            while(decided == False):
+                ### Role Loop: GM decides which roles are included.
+                    roles_str = await dm_input(gm_id, "Role options include: villager, werewolf, \
+                        mason, troublemaker, robber, seer, drunk, hunter, tanner, minion. Enter comma separated \
+                        roles you would like to include. Must include {} roles. Roles will be assigned directly to players. \
+                            Here are the players: {}".format(len(player_ids), nicknames))
+                roles_str.replace(' ', '')
+                roles = roles_str.split(',')
+                role_dict = dict(zip(nicknames, roles))
+                #global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'robber', 'seer', 'drunk', 'hunter', 'minion']
+                decided_str = await dm_input(gm_id, "Your player:roles are: {}. Is this ok? (Y/N) ".format(role_dict))
+                if decided_str == 'Y' and len(roles) == len(player_ids) and validate_roles(roles):
+                    decided = True
+                elif len(roles) != len(player_ids):
+                    await dm_print(gm_id, 'Length of roles given ({}) does not match number of players ({}).'.format(len(roles), len(player_ids)))
+                elif validate_roles(roles) == False:
+                    await dm_print(gm_id, 'Invalid roles.')
+
         global player_list = []
 
         ### Contruct array of Player objects.
@@ -177,7 +216,6 @@ async def on_message(message):
         role_message = await client.get_user(gm_id).send(format_player_list(player_list))
 
     if message.content == 'werewolf.startgame':
-<<<<<<< HEAD
         await message.channel.send('Game is starting, everyone close your eyes!')
 
         for i in range(len(player_list)):
@@ -227,11 +265,6 @@ async def on_message(message):
         vote_list = list(vote_dict.values())
         death = player_nicks_vote[vote_list.index(max(vote_list))]
         deaths.append(death)
-=======
-
-
-
->>>>>>> 4ecd1f3757fa8db7e60e6b8dfb805279ad76b983
 
         if len(deaths) == 1:
             await message.channel.send('{} was killed by the village.'.format(death))
