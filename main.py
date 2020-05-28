@@ -151,6 +151,16 @@ async def on_message(message):
         ### 100, 101, and 102 are the middle cards.
         player_ids.extend([100, 101, 102])
 
+        ### Manual role prompt
+        '''
+        manual_roles = False
+        manual_role_ask = dm_input(gm_id, 'Would you like to assign roles manually? (Y/N) ')
+        if manual_role_ask == 'Y':
+            manual_roles = True
+        else:
+            manual_roles = False
+        '''
+        
         decided = False
         while(decided == False):
             ### Role Loop: GM decides which roles are included.
@@ -230,7 +240,7 @@ async def on_message(message):
             await message.channel.send('{} was killed by the village.'.format(death))
         else:
             await message.channel.send('{} and {} were killed by the village.'.format(deaths[0], deaths[1]))
-            
+
         for p in player_list:
             if p.nickname in death:
                 if p.role == 'werewolf':
