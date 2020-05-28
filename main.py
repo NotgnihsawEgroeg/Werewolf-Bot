@@ -11,15 +11,10 @@ class Player():
         self.player_id = player_id
         self.role = role
         self.nickname = nickname
-
     def set_nick(self, new_nick):
         self.nickname = new_nick
-
     def set_role(self, new_role):
         self.role = new_role
-
-    def __str__(self):
-        return '[id: {}, nickname: {}, role: {}]'.format(self.player_id, self.nickname, self.role)
 
 async def dm_input(user_id, prompt):
     #print("starting dm")
@@ -54,45 +49,66 @@ def format_player_list(player_list):
 class Action():
     def __init__(self, player, player_list):
         self.player = player
+        self.nick_list = []
+        for player_element in player_list:
+            self.nick_list.append(player_element.nickname)
+
         if player.role == 'troublemaker':
             self.type = 'swap'
+            prompt = "Which two players would you like to swap? (comma separated)"
+            def get_troublemaker_input(prompt):
+                temp_input = dm_input(player.player_id, prompt)
+                input_list = input.split(",")
+                if input_list.length() == 2:
+                    input_list[0] = input_list[0].strip()
+                    input_list[1] = input_list[1].strip()
+                    if (input_list[0] in self.nick_list) and (input_list[1] in self.nick_list):
+
+                if
         elif player.role == 'robber':
             self.type = 'swap'
         elif player.role == 'insomniac':
             self.type = 'inform_insom'
-        elif player.role == "mason":
+        elif player.role == 'mason':
             self.type = 'inform_mason'
         elif player.role == 'werewolf':
             self.type = 'inform_were'
         elif player.role == 'minion':
             self.type = 'inform_minion'
+        elif player.role == 'drunk':
+            self.type = 'prompt_drunk'
         elif player.role == 'seer':
-            prompt 
-            if dm_input(player.player_id, )
+            prompt = "Would you like to see cards (type 'cards') or player (type 'player')?"
+            def get_seer_input(prompt):
+                input = dm_input(player.player_id, prompt)
+                if input == 'player':
+                    message = 'Input accepted!'
+                    dm_print(player.player_id, message)
+                    return 'see_player'
+                elif input == 'cards':
+                    message = 'Input accepted!'
+                    dm_print(player.player_id, message)
+                    return 'see_cards'
+                else:
+                    prompt = "Not a valid option. Please try again."
+                    return get_seer_input(prompt)
+            self.type = get_seer_input(prompt)
+
+
+
     def execute(self, player_list)
 
 
 gm_id = 268834601466593280
 global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'robber', 'seer', 'drunk', 'hunter', 'minion']
 werewolf_textchannel = 711232285994909749
-player_list = []
-
-def validate_roles(role_list):
-    global global_roles
-    for i in range(len(role_list)):
-        if role_list[i] not in global_roles:
-            return False
-    return True
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 PREFIX = str(os.getenv('PREFIX'))
 
-<<<<<<< HEAD
-=======
 
->>>>>>> f7a5a81f448e9b17aea0e7a6edbc4119da9b8c8d
 client = discord.Client()
 
 @client.event
@@ -101,7 +117,6 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    global player_list
     if message.author == client.user:
         return
 
@@ -125,17 +140,15 @@ async def on_message(message):
             roles = roles_str.split(',')
             #global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'robber', 'seer', 'drunk', 'hunter', 'minion']
             decided_str = await dm_input(gm_id, "Your roles are: {}. Is this ok? (Y/N) ".format(roles))
-            if decided_str == 'Y' and len(roles) == len(player_ids) and validate_roles(roles):
+            if decided_str == 'Y' and len(roles) == len(player_ids):
                 decided = True
             elif len(roles) != len(player_ids):
                 await dm_print(gm_id, 'Length of roles given ({}) does not match number of players ({}).'.format(len(roles), len(player_ids)))
-            elif validate_roles(roles) == False:
-                await dm_print(gm_id, 'You have given an invalid role.')
 
         random.shuffle(roles)
         #player_dict = dict(zip(player_ids, roles))
         nickname_dict = await get_nicks(player_ids)
-        player_list = []
+        global player_list = []
 
         ### Contruct array of Player objects.
         for i in range(len(player_ids)):
@@ -145,54 +158,9 @@ async def on_message(message):
         role_message = await client.get_user(gm_id).send(format_player_list(player_list))
 
     if message.content == 'werewolf.startgame':
-        await message.channel.send('Game is starting, everyone close your eyes!')
 
-        for i in range(len(player_list)):
-            if player_list[i].player_id == 100 or player_list[i].player_id == 101 or player_list[i].player_id == 102:
-                pass
-            else:
-                print(player_list[i])
-                #await dm_print(player_list[i].player_id, 'Your starting role is {}. Good Luck!'.format(player_list[i].role))
-                pass
 
-        ### Night Actions Here
 
-        ### After Night Actions, have a 10 minute wait period with warnings.
-        await message.channel.send('Everybody wake up and begin discussion. You have 10 minutes.')
-        '''
-        await asyncio.sleep(300)
-        await message.channel.send('5 Minutes left.')
-
-        await asyncio.sleep(120)
-        await message.channel.send('2 Minutes left.')
-
-        await asyncio.sleep(60)
-        await message.channel.send('1 Minute left')
-
-        await asyncio.sleep(30)
-        await message.channel.send('30 Seconds left')
-
-        await asyncio.sleep(30)
-        await message.channel.send('TIME\'S UP!!! YOU MUST VOTE NOW!')
-        '''
-        ### Voting
-        deaths = []
-
-        player_nicks_vote = [0] * len(player_list)
-        for i in range(len(player_list)):
-            player_nicks_vote[i] = player_list[i].nickname
-
-        vote_dict = dict(zip(player_nicks_vote, [0 for j in range(len(player_nicks_vote))]))
-        for i in range(len(player_list)):
-            vote = await dm_input(player_list[i].player_id, 'Who do you want to kill? Options are: {}.'.format(player_nicks_vote))
-            if player_list[i].role == 'hunter':
-                deaths.append(vote)
-            else:
-                vote_dict[vote] += 1
-        
-        await dm_print(gm_id, str(vote_dict))
-        vote_list = list(vote_dict.values())
-        death = player_nicks_vote[vote_list.index(max(vote_list))]
 
 
 client.run(TOKEN)
