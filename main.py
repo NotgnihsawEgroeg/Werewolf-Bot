@@ -51,6 +51,7 @@ def format_player_list(player_list):
 
 async def get_action(player):
     if player.role == 'seer':
+        pass
         
 
 gm_id = 268834601466593280
