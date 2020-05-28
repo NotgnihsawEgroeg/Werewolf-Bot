@@ -7,15 +7,17 @@ import asyncio
 import random
 
 class Player():
-    def __init__(player_id, role, nickname):
+    def __init__(self, player_id, role, nickname):
         self.player_id = player_id
         self.role = role
         self.nickname = nickname
-    def set_nick(new_nick):
+    def set_nick(self, new_nick):
         self.nickname = new_nick
-    def set_role(new_role):
+    def set_role(self, new_role):
         self.role = new_role
 
+class Action():
+    def __init__(player)
 async def dm_input(user_id, prompt):
     #print("starting dm")
     msg = await client.get_user(user_id).send(prompt)
@@ -55,6 +57,9 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 PREFIX = str(os.getenv('PREFIX'))
 
+async def get_action(player):
+    if player.role == 'seer'
+
 client = discord.Client()
 
 @client.event
@@ -68,10 +73,10 @@ async def on_message(message):
 
     if message.content == 'werewolf.help':
         pass
-    
+
     if message.content == 'werewolf.setplayers':
         await message.channel.send('Consulting the Game Master ... ')
-        ### GM decides who's playing. 
+        ### GM decides who's playing.
         player_ids_str = await dm_input(gm_id, "Enter comma separated player ids. ")
         player_ids_str = player_ids_str.replace(' ', '')
         #player_ids = split(',', player_ids_str)
@@ -81,7 +86,7 @@ async def on_message(message):
 
         decided = False
         while(decided == False):
-            ### Role Loop: GM decides which roles are included. 
+            ### Role Loop: GM decides which roles are included.
             roles_str = await dm_input(gm_id, "Role options include: villager, werewolf, mason, troublemaker, robber, seer, drunk, hunter, tanner, minion. Enter comma separated roles you would like to include. Must include {} roles. ".format(len(player_ids)))
             roles = roles_str.split(',')
             #global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'robber', 'seer', 'drunk', 'hunter', 'minion']
@@ -116,5 +121,9 @@ async def on_message(message):
 
         ### Night Actions Here
         
+
+
+
+
 
 client.run(TOKEN)
