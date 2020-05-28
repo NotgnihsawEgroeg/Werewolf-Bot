@@ -49,6 +49,10 @@ def format_player_list(player_list):
         string += '{} : {}\n'.format(player_list[i].nickname, player_list[i].role)
     return string
 
+async def get_action(player):
+    if player.role == 'seer':
+        
+
 gm_id = 268834601466593280
 global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'robber', 'seer', 'drunk', 'hunter', 'minion']
 werewolf_textchannel = 711232285994909749
@@ -58,9 +62,6 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 PREFIX = str(os.getenv('PREFIX'))
-
-async def get_action(player):
-    if player.role == 'seer'
 
 client = discord.Client()
 
