@@ -190,9 +190,25 @@ async def on_message(message):
             else:
                 vote_dict[vote] += 1
         
-        await dm_print(gm_id, str(vote_dict))
+        await dm_print(gm_id, 'Here are the votes: {}'.format(str(vote_dict)))
         vote_list = list(vote_dict.values())
         death = player_nicks_vote[vote_list.index(max(vote_list))]
+        deaths.append(death)
 
+        if len(deaths) == 1:
+            await message.channel.send('{} was killed by the village.'.format(death))
+        else:
+            await message.channel.send('{} and {} were killed by the village.'.format(deaths[0], deaths[1]))
+            
+        for p in player_list:
+            if p.nickname in death:
+                if p.role == 'werewolf':
+                    await message.channel.send('{} was a werewolf. The villagers win!'.format(p.nickname))
+                elif p.role == 'tanner':
+                    await message.channel.send('{} was a tanner. They win!'.format(p.nickname))
+                else:
+                    await message.channel.send('{} was a {}. The werewolves win!'.format(p.nickname, p.role))
+    
+        
 
 client.run(TOKEN)
