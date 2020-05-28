@@ -176,9 +176,76 @@ async def on_message(message):
         role_message = await client.get_user(gm_id).send(format_player_list(player_list))
 
     if message.content == 'werewolf.startgame':
+<<<<<<< HEAD
+        await message.channel.send('Game is starting, everyone close your eyes!')
+
+        for i in range(len(player_list)):
+            if player_list[i].player_id == 100 or player_list[i].player_id == 101 or player_list[i].player_id == 102:
+                pass
+            else:
+                print(player_list[i])
+                #await dm_print(player_list[i].player_id, 'Your starting role is {}. Good Luck!'.format(player_list[i].role))
+                pass
+
+        ### Night Actions Here
+
+        ### After Night Actions, have a 10 minute wait period with warnings.
+        await message.channel.send('Everybody wake up and begin discussion. You have 10 minutes.')
+        '''
+        await asyncio.sleep(300)
+        await message.channel.send('5 Minutes left.')
+
+        await asyncio.sleep(120)
+        await message.channel.send('2 Minutes left.')
+
+        await asyncio.sleep(60)
+        await message.channel.send('1 Minute left')
+
+        await asyncio.sleep(30)
+        await message.channel.send('30 Seconds left')
+
+        await asyncio.sleep(30)
+        await message.channel.send('TIME\'S UP!!! YOU MUST VOTE NOW!')
+        '''
+        ### Voting
+        deaths = []
+
+        player_nicks_vote = [0] * len(player_list)
+        for i in range(len(player_list)):
+            player_nicks_vote[i] = player_list[i].nickname
+
+        vote_dict = dict(zip(player_nicks_vote, [0 for j in range(len(player_nicks_vote))]))
+        for i in range(len(player_list)):
+            vote = await dm_input(player_list[i].player_id, 'Who do you want to kill? Options are: {}.'.format(player_nicks_vote))
+            if player_list[i].role == 'hunter':
+                deaths.append(vote)
+            else:
+                vote_dict[vote] += 1
+        
+        await dm_print(gm_id, 'Here are the votes: {}'.format(str(vote_dict)))
+        vote_list = list(vote_dict.values())
+        death = player_nicks_vote[vote_list.index(max(vote_list))]
+        deaths.append(death)
+=======
 
 
 
+>>>>>>> 4ecd1f3757fa8db7e60e6b8dfb805279ad76b983
 
+        if len(deaths) == 1:
+            await message.channel.send('{} was killed by the village.'.format(death))
+        else:
+            await message.channel.send('{} and {} were killed by the village.'.format(deaths[0], deaths[1]))
+            
+        for p in player_list:
+            if p.nickname in death:
+                if p.role == 'werewolf':
+                    await message.channel.send('{} was a werewolf. The villagers win!'.format(p.nickname))
+                elif p.role == 'tanner':
+                    await message.channel.send('{} was a tanner. They win!'.format(p.nickname))
+                else:
+                    await message.channel.send('{} was a {}. The werewolves win!'.format(p.nickname, p.role))
+    
+        
 
 client.run(TOKEN)
