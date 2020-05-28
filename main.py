@@ -21,9 +21,6 @@ class Player():
     def __str__(self):
         return '[id: {}, nickname: {}, role: {}]'.format(self.player_id, self.nickname, self.role)
 
-class Action():
-    def __init__(player):
-        pass
 async def dm_input(user_id, prompt):
     #print("starting dm")
     msg = await client.get_user(user_id).send(prompt)
@@ -54,13 +51,26 @@ def format_player_list(player_list):
         string += '{} : {}\n'.format(player_list[i].nickname, player_list[i].role)
     return string
 
-async def get_action(player):
-    if player.role == 'seer':
-        pass
+class Action():
+    def __init__(self, player, player_list):
+        self.player = player
+        if player.role == 'troublemaker':
+            self.type = 'swap'
+        elif player.role == 'robber':
+            self.type = 'swap'
+        elif player.role == 'insomniac':
+            self.type = 'inform_insom'
+        elif player.role == "mason":
+            self.type = 'inform_mason'
+        elif player.role == 'werewolf':
+            self.type = 'inform_were'
+        elif player.role == 'minion':
+            self.type = 'inform_minion'
+        elif player.role == 'seer':
+            prompt 
+            if dm_input(player.player_id, )
+    def execute(self, player_list)
 
-
-
-        
 
 gm_id = 268834601466593280
 global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'robber', 'seer', 'drunk', 'hunter', 'minion']
@@ -79,6 +89,10 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 PREFIX = str(os.getenv('PREFIX'))
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f7a5a81f448e9b17aea0e7a6edbc4119da9b8c8d
 client = discord.Client()
 
 @client.event
