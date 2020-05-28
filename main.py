@@ -17,7 +17,8 @@ class Player():
         self.role = new_role
 
 class Action():
-    def __init__(player)
+    def __init__(player):
+        pass
 async def dm_input(user_id, prompt):
     #print("starting dm")
     msg = await client.get_user(user_id).send(prompt)
@@ -51,6 +52,7 @@ def format_player_list(player_list):
 gm_id = 268834601466593280
 global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'robber', 'seer', 'drunk', 'hunter', 'minion']
 werewolf_textchannel = 711232285994909749
+player_list = []
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -68,6 +70,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    global player_list
     if message.author == client.user:
         return
 
