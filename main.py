@@ -105,7 +105,6 @@ async def on_message(message):
 
     if message.content == 'werewolf.startgame':
         
-
         
 
 client.run(TOKEN)
