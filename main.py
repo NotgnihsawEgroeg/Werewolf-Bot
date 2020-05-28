@@ -57,7 +57,7 @@ class Action():
             self.type = 'swap'
             prompt = "Which two players would you like to swap? (comma separated)"
             def get_troublemaker_input(prompt, nick_list, player_id):
-                temp_input = dm_input(player_id, prompt)
+                temp_input = await dm_input(player_id, prompt)
                 input_list = input.split(",")
                 if input_list.length() == 2:
                     input_list[0] = input_list[0].strip()
@@ -78,7 +78,7 @@ class Action():
             self.player_swap_list.append(player.nickname)
             prompt = "Enter a player to steal their role."
             def get_robber_input(prompt, nick_list, player_id):
-                input = dm_input(player_id, prompt)
+                input = await dm_input(player_id, prompt)
                 if input in nick_list:
                     return input
                 else:
@@ -98,14 +98,14 @@ class Action():
         elif player.role == 'seer':
             prompt = "Would you like to see cards (type 'cards') or player (type 'player')?"
             def get_seer_input(prompt):
-                input = dm_input(player.player_id, prompt)
+                input = await dm_input(player.player_id, prompt)
                 if input == 'player':
                     message = 'Input accepted!'
-                    dm_print(player.player_id, message)
+                    await dm_print(player.player_id, message)
                     return 'see_player'
                 elif input == 'cards':
                     message = 'Input accepted!'
-                    dm_print(player.player_id, message)
+                    await dm_print(player.player_id, message)
                     return 'see_cards'
                 else:
                     prompt = "Not a valid option. Please try again."
