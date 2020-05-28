@@ -56,17 +56,35 @@ class Action():
         if player.role == 'troublemaker':
             self.type = 'swap'
             prompt = "Which two players would you like to swap? (comma separated)"
-            def get_troublemaker_input(prompt):
-                temp_input = dm_input(player.player_id, prompt)
+            def get_troublemaker_input(prompt, nick_list, player_id):
+                temp_input = dm_input(player_id, prompt)
                 input_list = input.split(",")
                 if input_list.length() == 2:
                     input_list[0] = input_list[0].strip()
                     input_list[1] = input_list[1].strip()
-                    if (input_list[0] in self.nick_list) and (input_list[1] in self.nick_list):
+                    if (input_list[0] in nick_list) and (input_list[1] in nick_list):
+                        return input_list
+                    else:
+                        prompt = "Player not found. Please try again."
+                        return get_troublemaker_input(prompt, nick_list)
+                else:
+                    prompt = "Please input two players and try again."
+                    return get_troublemaker_input(prompt, nick_list)
+            self.player_swap_list = get_troublemaker_input(prompt, self.nick_list, self.player_id)
 
-                if
         elif player.role == 'robber':
             self.type = 'swap'
+            self.player_swap_list = []
+            self.player_swap_list.append(player.nickname)
+            prompt = "Enter a player to steal their role."
+            def get_robber_input(prompt, nick_list, player_id):
+                input = dm_input(player_id, prompt)
+                if input in nick_list:
+                    return input
+                else:
+                    prompt = "Player not found. Please try again."
+                    return get_robber_input(prompt, nick_list, player_id)
+            self.player_swap_list.append(get_robber_input(prompt, self.nick_list, self.player_id))
         elif player.role == 'insomniac':
             self.type = 'inform_insom'
         elif player.role == 'mason':
