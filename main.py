@@ -85,6 +85,7 @@ class Action():
                     prompt = "Player not found. Please try again."
                     return get_robber_input(prompt, nick_list, player_id)
             self.player_swap_list.append(get_robber_input(prompt, self.nick_list, self.player_id))
+            
         elif player.role == 'insomniac':
             self.type = 'inform_insom'
         elif player.role == 'mason':
@@ -221,7 +222,7 @@ async def on_message(message):
                 deaths.append(vote)
             else:
                 vote_dict[vote] += 1
-        
+
         await dm_print(gm_id, 'Here are the votes: {}'.format(str(vote_dict)))
         vote_list = list(vote_dict.values())
         death = player_nicks_vote[vote_list.index(max(vote_list))]
@@ -236,7 +237,7 @@ async def on_message(message):
             await message.channel.send('{} was killed by the village.'.format(death))
         else:
             await message.channel.send('{} and {} were killed by the village.'.format(deaths[0], deaths[1]))
-            
+
         for p in player_list:
             if p.nickname in death:
                 if p.role == 'werewolf':
@@ -245,7 +246,7 @@ async def on_message(message):
                     await message.channel.send('{} was a tanner. They win!'.format(p.nickname))
                 else:
                     await message.channel.send('{} was a {}. The werewolves win!'.format(p.nickname, p.role))
-    
-        
+
+
 
 client.run(TOKEN)
