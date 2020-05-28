@@ -11,10 +11,15 @@ class Player():
         self.player_id = player_id
         self.role = role
         self.nickname = nickname
+
     def set_nick(self, new_nick):
         self.nickname = new_nick
+
     def set_role(self, new_role):
         self.role = new_role
+
+    def __str__(self):
+        return '[id: {}, nickname: {}, role: {}]'.format(self.player_id, self.nickname, self.role)
 
 class Action():
     def __init__(player):
