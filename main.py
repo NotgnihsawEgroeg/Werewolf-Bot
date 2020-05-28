@@ -104,7 +104,17 @@ async def on_message(message):
         role_message = await client.get_user(gm_id).send(format_player_list(player_list))
 
     if message.content == 'werewolf.startgame':
-        
+        await message.channel.send('Game is starting, everyone close your eyes!')
+
+        for i in range(len(player_list)):
+            if player_list[i].player_id == 100 or player_list[i].player_id == 101 or player_list[i].player_id == 102:
+                pass
+            else:
+                print(player_list[i])
+                #await dm_print(player_list[i].player_id, 'Your starting role is {}. Good Luck!'.format(player_list[i].role))
+                pass
+
+        ### Night Actions Here
         
 
 client.run(TOKEN)
