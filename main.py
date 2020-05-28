@@ -57,12 +57,22 @@ def format_player_list(player_list):
 async def get_action(player):
     if player.role == 'seer':
         pass
+
+
+
         
 
 gm_id = 268834601466593280
 global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'robber', 'seer', 'drunk', 'hunter', 'minion']
 werewolf_textchannel = 711232285994909749
 player_list = []
+
+def validate_roles(role_list):
+    global global_roles
+    for i in range(len(role_list)):
+        if role_list[i] not in global_roles:
+            return False
+    return True
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -101,10 +111,12 @@ async def on_message(message):
             roles = roles_str.split(',')
             #global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'robber', 'seer', 'drunk', 'hunter', 'minion']
             decided_str = await dm_input(gm_id, "Your roles are: {}. Is this ok? (Y/N) ".format(roles))
-            if decided_str == 'Y' and len(roles) == len(player_ids):
+            if decided_str == 'Y' and len(roles) == len(player_ids) and validate_roles(roles):
                 decided = True
             elif len(roles) != len(player_ids):
                 await dm_print(gm_id, 'Length of roles given ({}) does not match number of players ({}).'.format(len(roles), len(player_ids)))
+            elif validate_roles(roles) == False:
+                await dm_print(gm_id, 'You have given an invalid role.')
 
         random.shuffle(roles)
         #player_dict = dict(zip(player_ids, roles))
@@ -130,10 +142,43 @@ async def on_message(message):
                 pass
 
         ### Night Actions Here
+
+        ### After Night Actions, have a 10 minute wait period with warnings.
+        await message.channel.send('Everybody wake up and begin discussion. You have 10 minutes.')
+        '''
+        await asyncio.sleep(300)
+        await message.channel.send('5 Minutes left.')
+
+        await asyncio.sleep(120)
+        await message.channel.send('2 Minutes left.')
+
+        await asyncio.sleep(60)
+        await message.channel.send('1 Minute left')
+
+        await asyncio.sleep(30)
+        await message.channel.send('30 Seconds left')
+
+        await asyncio.sleep(30)
+        await message.channel.send('TIME\'S UP!!! YOU MUST VOTE NOW!')
+        '''
+        ### Voting
+        deaths = []
+
+        player_nicks_vote = [0] * len(player_list)
+        for i in range(len(player_list)):
+            player_nicks_vote[i] = player_list[i].nickname
+
+        vote_dict = dict(zip(player_nicks_vote, [0 for j in range(len(player_nicks_vote))]))
+        for i in range(len(player_list)):
+            vote = await dm_input(player_list[i].player_id, 'Who do you want to kill? Options are: {}.'.format(player_nicks_vote))
+            if player_list[i].role == 'hunter':
+                deaths.append(vote)
+            else:
+                vote_dict[vote] += 1
         
-
-
-
+        await dm_print(gm_id, str(vote_dict))
+        vote_list = list(vote_dict.values())
+        death = player_nicks_vote[vote_list.index(max(vote_list))]
 
 
 client.run(TOKEN)
