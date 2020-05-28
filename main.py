@@ -94,7 +94,7 @@ async def on_message(message):
         random.shuffle(roles)
         #player_dict = dict(zip(player_ids, roles))
         nickname_dict = await get_nicks(player_ids)
-        global player_list = []
+        player_list = []
 
         ### Contruct array of Player objects.
         for i in range(len(player_ids)):
