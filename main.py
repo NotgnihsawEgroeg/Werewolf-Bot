@@ -158,7 +158,6 @@ async def on_message(message):
         role_message = await client.get_user(gm_id).send(format_player_list(player_list))
 
     if message.content == 'werewolf.startgame':
-<<<<<<< HEAD
         await message.channel.send('Game is starting, everyone close your eyes!')
 
         for i in range(len(player_list)):
@@ -208,11 +207,6 @@ async def on_message(message):
         vote_list = list(vote_dict.values())
         death = player_nicks_vote[vote_list.index(max(vote_list))]
         deaths.append(death)
-=======
-
-
-
->>>>>>> 4ecd1f3757fa8db7e60e6b8dfb805279ad76b983
 
         if len(deaths) == 1:
             await message.channel.send('{} was killed by the village.'.format(death))
