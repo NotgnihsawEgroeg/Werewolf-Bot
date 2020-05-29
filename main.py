@@ -367,6 +367,11 @@ async def on_message(message):
                 pass
 
         ### Night Actions Here
+        action_list = []
+        for p in player_list:
+            action_list.append(Action(p, player_list))
+        
+        execute_all(action_list, player_list)
 
         ### After Night Actions, have a 10 minute wait period with warnings.
         await message.channel.send('Everybody wake up and begin discussion. You have 10 minutes.')
@@ -382,10 +387,10 @@ async def on_message(message):
 
         await asyncio.sleep(30)
         await message.channel.send('30 Seconds left')
-
+        '''
         await asyncio.sleep(30)
         await message.channel.send('TIME\'S UP!!! YOU MUST VOTE NOW!')
-        '''
+        
         ### Voting
         deaths = []
 
