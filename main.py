@@ -270,7 +270,6 @@ def execute_actions(action_type, action_list, player_list):
             player_list = action.execute(player_list)
     return player_list
 
-<<<<<<< HEAD
 ### Executes all actions in order
 def execute_all(action_list, player_list):
     player_list = execute_actions('inform_were', action_list, player_list)
@@ -283,9 +282,6 @@ def execute_all(action_list, player_list):
     player_list = execute_actions('prompt_drunk', action_list, player_list)
     player_list = execute_actions('inform_insom', action_list, player_list)
 
-=======
-### Executes all actions in order
->>>>>>> 374d9d3e3dc90f74fa8671b80e3520ffe6be453c
 
 gm_id = 268834601466593280
 global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'robber', 'seer', 'drunk', 'hunter', 'minion']
