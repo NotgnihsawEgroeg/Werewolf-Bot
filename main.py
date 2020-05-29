@@ -58,7 +58,7 @@ class Action():
             prompt = "Which two players would you like to swap? (comma separated)"
             def get_troublemaker_input(prompt, nick_list, player_id):
                 temp_input = await dm_input(player_id, prompt)
-                input_list = input.split(",")
+                input_list = temp_input.split(",")
                 if input_list.length() == 2:
                     input_list[0] = input_list[0].strip()
                     input_list[1] = input_list[1].strip()
@@ -66,7 +66,7 @@ class Action():
                         return input_list
                     else:
                         prompt = "Player not found. Please try again."
-                        return get_troublemaker_input(prompt, nick_list)
+                        return get_troublemaker_input(prompt, nick_list, player_id)
                 else:
                     prompt = "Please input two players and try again."
                     return get_troublemaker_input(prompt, nick_list)
@@ -85,24 +85,48 @@ class Action():
                     prompt = "Player not found. Please try again."
                     return get_robber_input(prompt, nick_list, player_id)
             self.player_swap_list.append(get_robber_input(prompt, self.nick_list, self.player_id))
-            
+
         elif player.role == 'insomniac':
             self.type = 'inform_insom'
+
         elif player.role == 'mason':
             self.type = 'inform_mason'
+
         elif player.role == 'werewolf':
             self.type = 'inform_were'
+
         elif player.role == 'minion':
             self.type = 'inform_minion'
+
         elif player.role == 'drunk':
             self.type = 'prompt_drunk'
+            prompt = "Pick a number, 1 through 3."
+            def get_drunk_card_id(prompt, player_id):
+                input = await dm_input(player_id, prompt)
+                try:
+                    input = int(input)
+                except ValueError:
+                    prompt = "A NUMBER, in base 10, 1 through 3, dummy. Try again."
+                    return get_drunk_card_id(player_id, prompt)
+                except:
+                    print("Unexpected error picking drunk card.")
+                    raise
+
+                if input < 4 && input > 0:
+                    return ((input - 1) + 100)
+                else:
+                    prompt = "The card number must be between 1 and 3. Try again."
+                    return get_drunk_card_id(prompt, player_id)
+
+            self.picked_card_id = get_drunk_card_id(prompt, player.player_id)
+
         elif player.role == 'seer':
-            prompt = "Would you like to see cards (type 'cards') or player (type 'player')?"
-            def get_seer_input(prompt):
+            prompt = "Would you like to see two cards (type 'cards') or a player (type 'player')?"
+            def get_seer_input(prompt,  player_list):
                 input = await dm_input(player.player_id, prompt)
                 if input == 'player':
-                    message = 'Input accepted!'
-                    await dm_print(player.player_id, message)
+                    prompt = "Which player?"
+                    input = await dm_input(player.player_id, prompt)
                     return 'see_player'
                 elif input == 'cards':
                     message = 'Input accepted!'
@@ -111,6 +135,7 @@ class Action():
                 else:
                     prompt = "Not a valid option. Please try again."
                     return get_seer_input(prompt)
+
             self.type = get_seer_input(prompt)
 
 
@@ -165,7 +190,7 @@ async def on_message(message):
             manual_roles = True
         else:
             manual_roles = False
-        
+
         if manual_roles:
             decided = False
             while(decided == False):
