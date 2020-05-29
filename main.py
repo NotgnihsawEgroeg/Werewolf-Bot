@@ -50,7 +50,7 @@ def format_player_list(player_list):
 ### Night Action class
 
 class Action():
-    async def __init__(self, player, player_list):
+    async def __init__(self, player, player_list, player_role_dict):
         self.player = player
 
         ### Constructs nick list for swaps
@@ -136,51 +136,78 @@ class Action():
 
         elif player.role == 'seer':
             prompt = "Would you like to see two cards (type 'cards') or a player (type 'player')?"
-            def get_seer_input(prompt,  player_list):
-                input = await dm_input(player.player_id, prompt)
+            def get_seer_input(prompt,  player_list, player_id):
+                input = await dm_input(player_id, prompt)
+                seer_action_dict = {'type' : None, 'player' : None}
                 if input == 'player':
                     prompt = "Which player?"
-                    input = await dm_input(player.player_id, prompt)
-                    return 'see_player'
+                    input = await dm_input(player_id, prompt)
+                    if input in player_list:
+                        seer_action_dict['type'] = 'see_player'
+                        seer_action_dict['player'] = input
+                        return seer_action_dict
+                    else:
+                        prompt = "Player not found, please try again. (type 'cards' or 'player')"
+                        return get_seer_input(prompt, player_list, player_id)
                 elif input == 'cards':
                     message = 'Input accepted!'
-                    await dm_print(player.player_id, message)
-                    return 'see_cards'
+                    await dm_print(player_id, message)
+                    seer_action_dict['type'] = 'see_cards'
+                    return seer_action_dict
                 else:
                     prompt = "Not a valid option. Please try again."
                     return get_seer_input(prompt)
 
-            self.type = get_seer_input(prompt)
+            seer_dict = get_seer_input(prompt, self.nick_list, player.player_id)
+            self.type = seer_dict['type']
+            self.seen_player = seer_dict['player']
 
-    #def execute(self, player_list)
+    def execute(self, player_role_dict):
+        if self.type == 'troublemaker_swap':
+            player_role_dict[self.player_swap_list[0]] = temp
+            player_role_dict[self.player_swap_list[1]] = player_role_dict[player_swap_list[0]]
+            player_role_dict[self.player_swap_list[1]] = temp
+            ### inform tm and gm
+            return player_role_dict
 
-<<<<<<< HEAD
+        elif self.type == 'robber_swap':
+            player_role_dict[self.player_swap_list[0]] = temp
+            player_role_dict[self.player_swap_list[1]] = player_role_dict[player_swap_list[0]]
+            player_role_dict[self.player_swap_list[1]] = temp
+            ### inform robber and gm
+            return player_role_dict
+
+        elif self.type == 'inform_insom':
+            message = "You are the insomniac."
+            dict_items = player_role_dict.items()
+            for nick, role in dict_items:
+                if role == 'insomniac':
+                    message = "You are the insomniac."
+                    await dm_print(get_player_from_nick(nick), message)
+            return player_role_dict
+        elif self.type == 'inform_were':
+            return
+        elif self.type == 'inform_minion':
+            return
+        elif self.type == 'inform_mason':
+            return
+        elif self.type == 'prompt_drunk':
+            return
+        elif self.type == 'see_player':
+            return
+        elif self.type == 'see_cards':
+            return
+        else:
+            raise("Action not found.")
+
 ### Takes a list of actions then executes the ones of the given type
 def execute_actions(action_type, action_list, player_role_dict):
     for action in action_list:
         if action_type == action.type:
             player_list = action.execute(player_role_dict)
     return player_list
-=======
-### Takes an action list and a player list and executes the actions in order.
-def execute_Actions(action_list, player_list):
-    ### Construct dict of nickname:player
-    nicks = []
-    for p in player_list:
-        nicks.append(p.nickname)
-    nick_dict = dict(zip(nicks, player_list))
-
-    ### Call actions in order:
-    # - werewolves
-    # - minion
-    # - masons
-    # - seer
-    # - robber
-    # - troublemaker
-    # - drunk
-    # - insomniac
->>>>>>> fb2e0cab1fd2aa5430361d0aecf6ede272bf0af4
-
+### Executes all actions in order
+def execute_all(action_list, player_role_dict):
 
 gm_id = 268834601466593280
 global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'robber', 'seer', 'drunk', 'hunter', 'minion']
