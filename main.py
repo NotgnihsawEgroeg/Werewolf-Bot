@@ -56,7 +56,7 @@ def get_player_from_nick(nickname, player_list):
 ### Night Action class
 
 class Action():
-    async def __init__(self, player, player_list, player_role_dict):
+    async def __init__(self, player, player_list):
         self.player = player
 
         ### Constructs nick list for swaps
@@ -109,9 +109,12 @@ class Action():
 
         elif player.role == 'mason':
             self.type = 'inform_mason'
+            self.check = False
 
         elif player.role == 'werewolf':
             self.type = 'inform_were'
+            self.were_check = False
+            self.min_check = False
 
         elif player.role == 'minion':
             self.type = 'inform_minion'
@@ -168,53 +171,93 @@ class Action():
             self.type = seer_dict['type']
             self.seen_player = seer_dict['player']
 
-    def execute(self, player_role_dict):
+    def execute(self, player_list):
         if self.type == 'troublemaker_swap':
-            player_role_dict[self.player_swap_list[0]] = temp
-            player_role_dict[self.player_swap_list[1]] = player_role_dict[player_swap_list[0]]
-            player_role_dict[self.player_swap_list[1]] = temp
-            ### inform tm and gm
-            return player_role_dict
+            for player1 in player_list:
+                if player1.nick == self.player_swap_list[0]:
+                    for player2 in player_list:
+                        if player2.nick == self.player_swap_list[1]:
+                            temp = player2.role
+                            player2.role = player1.role
+                            player1.role = temp
+                            return player_list
+
+            ###td: inform tm and gm
+            return
 
         elif self.type == 'robber_swap':
-            player_role_dict[self.player_swap_list[0]] = temp
-            player_role_dict[self.player_swap_list[1]] = player_role_dict[player_swap_list[0]]
-            player_role_dict[self.player_swap_list[1]] = temp
-            ### inform robber and gm
-            return player_role_dict
+            for player1 in player_list:
+                if player1.nick == self.player_swap_list[0]:
+                    for player2 in player_list:
+                        if player2.nick == self.player_swap_list[1]:
+                            temp = player2.role
+                            player2.role = player1.role
+                            player1.role = temp
+                            return player_list
+            ###td: inform robber and gm
+            return
 
         elif self.type == 'inform_insom':
-            message = "You are the insomniac."
-            dict_items = player_role_dict.items()
-            for nick, role in dict_items:
-                if role == 'insomniac':
-                    message = "You are the insomniac."
-                    await dm_print(get_player_from_nick(nick), message)
-            return player_role_dict
+            for player in player_list:
+                if player.role == 'insomniac':
+                    message = "You are currently the insomniac."
+                    await dm_print(player.player_id, message)
+            return player_list
+
         elif self.type == 'inform_were':
-            return
+            for player1 in player_list:
+                if player1.role == 'werewolf' && player1.were_check == False:
+                    player1.werecheck = True
+                    for player2 in player_list:
+                        if player2.role == 'werewolf' && player2.were_check == False:
+                            if player1.player_id in [100, 101, 102] and player2.player_id in [100, 101, 102]:
+                                pass
+                            elif player2.player_id in [100, 101, 102]:
+                                await dm_print(player1.player_id, "You are the only werewolf.")
+                            elif player1.player_id in [100, 101, 102]:
+                                await dm_print(player2.player_id, "You are the only werewolf.")
+                            else:
+                                await dm_print(player1.player_id, "The other werewolf is {}".format(player2.nickname))
+                                await dm_print(player2.player_id, "The other werewolf is {}".format(player1.nickname))
+            return player_list
+
         elif self.type == 'inform_minion':
             return
         elif self.type == 'inform_mason':
-            return
+            for player1 in player_list:
+                if player1.role == 'mason' && player1.check == False:
+                    player1.check = True
+                    for player2 in player_list:
+                        if player2.role == 'mason' && player2.check == False:
+                            if player1.player_id in [100, 101, 102] and player2.player_id in [100, 101, 102]:
+                                pass
+                            elif player2.player_id in [100, 101, 102]:
+                                await dm_print(player1.player_id, "You are the only mason.")
+                            elif player1.player_id in [100, 101, 102]:
+                                await dm_print(player2.player_id, "You are the only mason.")
+                            else:
+                                await dm_print(player1.player_id, "The other mason is {}".format(player2.nickname))
+                                await dm_print(player2.player_id, "The other mason is {}".format(player1.nickname))
+            return player_list
         elif self.type == 'prompt_drunk':
+            
             return
         elif self.type == 'see_player':
             return
         elif self.type == 'see_cards':
             return
         else:
-            raise("Action not found.")
+            raise("Action not found '{}'.".format(self.type))
 
 ### Takes a list of actions then executes the ones of the given type
-def execute_actions(action_type, action_list, player_role_dict):
+def execute_actions(action_type, action_list, player_list):
     for action in action_list:
         if action_type == action.type:
-            player_list = action.execute(player_role_dict)
+            player_list = action.execute(player_list)
     return player_list
 <<<<<<< HEAD
 ### Executes all actions in order
-def execute_all(action_list, player_role_dict):
+def execute_all(action_list, player_list):
 =======
 
 >>>>>>> b8cc4b455ba489e8cf8b4a172ffc47a1319b1574
