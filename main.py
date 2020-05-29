@@ -298,10 +298,11 @@ def validate_roles(role_list, global_roles):
     print(global_roles)
     for i in range(len(role_list)):
         for j in range(len(global_roles)):
+            print('checking {} and {}'.format(role_list[i], global_roles[j]))
             if role_list[i] == global_roles[j]:
                 validity += 1
             else:
-                print(role_list[i])
+                #print(role_list[i])
     
     print(validity)
     if validity == len(role_list):
