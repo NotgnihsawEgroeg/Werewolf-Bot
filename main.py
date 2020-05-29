@@ -69,7 +69,7 @@ class Action():
             self.type = 'troublemaker_swap'
             prompt = "Which two players would you like to swap? (comma separated)"
 
-            def get_troublemaker_input(prompt, nick_list, player_id):
+            async def get_troublemaker_input(prompt, nick_list, player_id):
                 temp_input = await dm_input(player_id, prompt)
                 input_list = temp_input.split(",")
 
@@ -94,7 +94,7 @@ class Action():
             self.player_swap_list.append(player.nickname)
             prompt = "Enter a player to steal their role."
 
-            def get_robber_input(prompt, nick_list, player_id):
+            async def get_robber_input(prompt, nick_list, player_id):
                 temp_input = await dm_input(player_id, prompt)
                 if temp_input in nick_list:
                     return temp_input
@@ -118,14 +118,13 @@ class Action():
 
         elif player.role == 'minion':
             self.type = 'inform_minion'
-            for player in player_list:
 
 
         elif player.role == 'drunk':
             self.type = 'prompt_drunk'
             prompt = "Pick a number, 1 through 3."
 
-            def get_drunk_card_id(prompt, player_id):
+            async def get_drunk_card_id(prompt, player_id):
                 temp_input = await dm_input(player_id, prompt)
                 try:
                     temp_input = int(temp_input)
@@ -147,7 +146,7 @@ class Action():
 
         elif player.role == 'seer':
             prompt = "Would you like to see two cards (type 'cards') or a player (type 'player')?"
-            def get_seer_input(prompt,  player_list, player_id):
+            async def get_seer_input(prompt,  player_list, player_id):
                 input = await dm_input(player_id, prompt)
                 seer_action_dict = {'type' : None, 'player' : None}
                 if input == 'player':
@@ -173,7 +172,7 @@ class Action():
             self.type = seer_dict['type']
             self.seen_player = seer_dict['player']
 
-    def execute(self, player_list):
+    async def execute(self, player_list):
         if self.type == 'troublemaker_swap':
             for player1 in player_list:
                 if player1.nick == self.player_swap_list[0]:
@@ -264,28 +263,29 @@ class Action():
             raise("Action not found '{}'.".format(self.type))
 
 ### Takes a list of actions then executes the ones of the given type
-def execute_actions(action_type, action_list, player_list):
+async def execute_actions(action_type, action_list, player_list):
     for action in action_list:
         if action_type == action.type:
-            player_list = action.execute(player_list)
+            player_list = await action.execute(player_list)
     return player_list
 
 ### Executes all actions in order
-def execute_all(action_list, player_list):
-    player_list = execute_actions('inform_were', action_list, player_list)
-    player_list = execute_actions('inform_minion', action_list, player_list)
-    player_list = execute_actions('inform_mason', action_list, player_list)
-    player_list = execute_actions('see_player', action_list, player_list)
-    player_list = execute_actions('see_cards', action_list, player_list)
-    player_list = execute_actions('robber_swap', action_list, player_list)
-    player_list = execute_actions('troublemaker_swap', action_list, player_list)
-    player_list = execute_actions('prompt_drunk', action_list, player_list)
-    player_list = execute_actions('inform_insom', action_list, player_list)
+async def execute_all(action_list, player_list):
+    player_list = await execute_actions('inform_were', action_list, player_list)
+    player_list = await execute_actions('inform_minion', action_list, player_list)
+    player_list = await execute_actions('inform_mason', action_list, player_list)
+    player_list = await execute_actions('see_player', action_list, player_list)
+    player_list = await execute_actions('see_cards', action_list, player_list)
+    player_list = await execute_actions('robber_swap', action_list, player_list)
+    player_list = await execute_actions('troublemaker_swap', action_list, player_list)
+    player_list = await execute_actions('prompt_drunk', action_list, player_list)
+    player_list = await execute_actions('inform_insom', action_list, player_list)
 
 
 gm_id = 268834601466593280
-global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'robber', 'seer', 'drunk', 'hunter', 'minion']
+global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'insomniac', 'robber', 'seer', 'drunk', 'hunter', 'minion']
 werewolf_textchannel = 711232285994909749
+player_list = []
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -293,10 +293,20 @@ GUILD = os.getenv('DISCORD_GUILD')
 PREFIX = str(os.getenv('PREFIX'))
 
 def validate_roles(role_list):
+    global global_roles
+    validity = 0
+    print(global_roles)
     for i in range(len(role_list)):
-        if role_list[i] not in global_roles:
-            return False
-    return True
+        if role_list[i] in global_roles:
+            validity += 1
+        else:
+            print(role_list[i])
+    
+    print(validity)
+    if validity == len(role_list):
+        return True
+    else: 
+        return False
 
 
 client = discord.Client()
@@ -307,6 +317,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    global global_roles
     if message.author == client.user:
         return
 
@@ -318,7 +329,7 @@ async def on_message(message):
         ### GM decides who's playing.
         player_ids_str = await dm_input(gm_id, "Enter comma separated player ids. ")
         player_ids_str = player_ids_str.replace(' ', '')
-        player_ids = split(',', player_ids_str)
+        player_ids = player_ids_str.split(',')
         #player_ids = list(range(len(global_roles)))
         ### 100, 101, and 102 are the middle cards.
         player_ids.extend([100, 101, 102])
@@ -331,11 +342,11 @@ async def on_message(message):
         else:
             manual_roles = False
 
-        if manual_roles:
+        if manual_roles == False:
             decided = False
             while(decided == False):
                 ### Role Loop: GM decides which roles are included.
-                roles_str = await dm_input(gm_id, "Role options include: villager, werewolf, mason, troublemaker, robber, seer, drunk, hunter, tanner, minion. Enter comma separated roles you would like to include. Must include {} roles. ".format(len(player_ids)))
+                roles_str = await dm_input(gm_id, "Role options include: {}. Enter comma separated roles you would like to include. Must include {} roles. ".format(global_roles, len(player_ids)))
                 roles_str.replace(' ', '')
                 roles = roles_str.split(',')
                 #global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'robber', 'seer', 'drunk', 'hunter', 'minion']
@@ -350,15 +361,12 @@ async def on_message(message):
             random.shuffle(roles)
         #player_dict = dict(zip(player_ids, roles))
         nickname_dict = await get_nicks(player_ids)
-        if manual_roles == False:
+        if manual_roles == True:
             nicknames = list(nickname_dict.values())
             decided = False
             while(decided == False):
                 ### Role Loop: GM decides which roles are included.
-                    roles_str = await dm_input(gm_id, "Role options include: villager, werewolf, \
-                        mason, troublemaker, robber, seer, drunk, hunter, tanner, minion. Enter comma separated \
-                        roles you would like to include. Must include {} roles. Roles will be assigned directly to players. \
-                            Here are the players: {}".format(len(player_ids), nicknames))
+                roles_str = await dm_input(gm_id, "Role options include: villager, werewolf, mason, troublemaker, robber, seer, drunk, hunter, tanner, minion. Enter comma separated roles you would like to include. Must include {} roles. Roles will be assigned directly to players. Here are the players: {}".format(len(player_ids), nicknames))
                 roles_str.replace(' ', '')
                 roles = roles_str.split(',')
                 role_dict = dict(zip(nicknames, roles))
@@ -371,7 +379,7 @@ async def on_message(message):
                 elif validate_roles(roles) == False:
                     await dm_print(gm_id, 'Invalid roles.')
 
-        global player_list = []
+        global player_list
 
         ### Contruct array of Player objects.
         for i in range(len(player_ids)):
