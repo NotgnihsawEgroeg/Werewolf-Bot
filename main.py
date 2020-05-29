@@ -156,10 +156,11 @@ class Action():
 
 ### Takes an action list and a player list and executes the actions in order.
 def execute_Actions(action_list, player_list):
-    ### Construct dict of role:action
-
-
     ### Construct dict of nickname:player
+    nicks = []
+    for p in player_list:
+        nicks.append(p.nickname)
+    nick_dict = dict(zip(nicks, player_list))
 
     ### Call actions in order:
     # - werewolves
