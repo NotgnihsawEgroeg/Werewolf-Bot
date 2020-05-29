@@ -338,7 +338,7 @@ async def on_message(message):
         player_ids_str = await dm_input(gm_id, "Enter comma separated player ids. ")
         player_ids_str = player_ids_str.replace(' ', '')
         #player_ids = player_ids_str.split(',')
-        player_ids = [267747233837875200,296686334532255744,317382944501137409,310950726178177025]
+        player_ids = [267747233837875200,296686334532255744,317382944501137409]
         #player_ids = list(range(len(global_roles)))
         ### 100, 101, and 102 are the middle cards.
         player_ids.extend([100, 101, 102])
