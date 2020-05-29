@@ -400,7 +400,7 @@ async def on_message(message):
         await asyncio.sleep(30)
         await message.channel.send('30 Seconds left')
         '''
-        await asyncio.sleep(30)
+        #await asyncio.sleep(30)
         await message.channel.send('TIME\'S UP!!! YOU MUST VOTE NOW!')
         
         ### Voting
