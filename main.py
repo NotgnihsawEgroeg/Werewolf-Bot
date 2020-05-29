@@ -280,7 +280,8 @@ def execute_all(action_list, player_list):
     player_list = execute_actions('see_cards', action_list, player_list)
     player_list = execute_actions('robber_swap', action_list, player_list)
     player_list = execute_actions('troublemaker_swap', action_list, player_list)
-    player_list = execute_actions('prompt_drunk')
+    player_list = execute_actions('prompt_drunk', action_list, player_list)
+    player_list = execute_actions('inform_insom', action_list, player_list)
 
 =======
 ### Executes all actions in order
