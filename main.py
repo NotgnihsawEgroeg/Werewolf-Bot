@@ -292,15 +292,16 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 PREFIX = str(os.getenv('PREFIX'))
 
-def validate_roles(role_list):
-    global global_roles
+def validate_roles(role_list, global_roles):
+    #global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'insomniac', 'robber', 'seer', 'drunk', 'hunter', 'minion'] 
     validity = 0
     print(global_roles)
     for i in range(len(role_list)):
-        if role_list[i] in global_roles:
-            validity += 1
-        else:
-            print(role_list[i])
+        for j in range(len(global_roles)):
+            if role_list[i] == global_roles[j]:
+                validity += 1
+            else:
+                print(role_list[i])
     
     print(validity)
     if validity == len(role_list):
@@ -351,11 +352,11 @@ async def on_message(message):
                 roles = roles_str.split(',')
                 #global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'robber', 'seer', 'drunk', 'hunter', 'minion']
                 decided_str = await dm_input(gm_id, "Your roles are: {}. Is this ok? (Y/N) ".format(roles))
-                if decided_str == 'Y' and len(roles) == len(player_ids) and validate_roles(roles):
+                if decided_str == 'Y' and len(roles) == len(player_ids) and validate_roles(roles, global_roles):
                     decided = True
                 elif len(roles) != len(player_ids):
                     await dm_print(gm_id, 'Length of roles given ({}) does not match number of players ({}).'.format(len(roles), len(player_ids)))
-                elif validate_roles(roles) == False:
+                elif validate_roles(roles, global_roles) == False:
                     await dm_print(gm_id, 'Invalid roles.')
 
             random.shuffle(roles)
@@ -372,11 +373,11 @@ async def on_message(message):
                 role_dict = dict(zip(nicknames, roles))
                 #global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'robber', 'seer', 'drunk', 'hunter', 'minion']
                 decided_str = await dm_input(gm_id, "Your player:roles are: {}. Is this ok? (Y/N) ".format(role_dict))
-                if decided_str == 'Y' and len(roles) == len(player_ids) and validate_roles(roles):
+                if decided_str == 'Y' and len(roles) == len(player_ids) and validate_roles(roles, global_roles):
                     decided = True
                 elif len(roles) != len(player_ids):
                     await dm_print(gm_id, 'Length of roles given ({}) does not match number of players ({}).'.format(len(roles), len(player_ids)))
-                elif validate_roles(roles) == False:
+                elif validate_roles(roles, global_roles) == False:
                     await dm_print(gm_id, 'Invalid roles.')
 
         global player_list
