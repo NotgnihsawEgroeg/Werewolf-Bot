@@ -46,6 +46,12 @@ def format_player_list(player_list):
         string += '{} : {}\n'.format(player_list[i].nickname, player_list[i].role)
     return string
 
+def get_player_from_nick(nickname, player_list):
+    for p in player_list:
+        if p.nickname == nickname:
+            return p.player_id
+    return -1
+
 
 ### Night Action class
 
@@ -206,8 +212,12 @@ def execute_actions(action_type, action_list, player_role_dict):
         if action_type == action.type:
             player_list = action.execute(player_role_dict)
     return player_list
+<<<<<<< HEAD
 ### Executes all actions in order
 def execute_all(action_list, player_role_dict):
+=======
+
+>>>>>>> b8cc4b455ba489e8cf8b4a172ffc47a1319b1574
 
 gm_id = 268834601466593280
 global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'robber', 'seer', 'drunk', 'hunter', 'minion']
