@@ -206,10 +206,10 @@ class Action():
 
         elif self.type == 'inform_were':
             for player1 in player_list:
-                if player1.role == 'werewolf' and player1.were_check == False:
+                if player1.role == 'werewolf' && player1.were_check == False:
                     player1.werecheck = True
                     for player2 in player_list:
-                        if player2.role == 'werewolf' and player2.were_check == False:
+                        if player2.role == 'werewolf' && player2.were_check == False:
                             if player1.player_id in [100, 101, 102] and player2.player_id in [100, 101, 102]:
                                 pass
                             elif player2.player_id in [100, 101, 102]:
@@ -225,10 +225,10 @@ class Action():
             return
         elif self.type == 'inform_mason':
             for player1 in player_list:
-                if player1.role == 'mason' and player1.check == False:
+                if player1.role == 'mason' && player1.check == False:
                     player1.check = True
                     for player2 in player_list:
-                        if player2.role == 'mason' and player2.check == False:
+                        if player2.role == 'mason' && player2.check == False:
                             if player1.player_id in [100, 101, 102] and player2.player_id in [100, 101, 102]:
                                 pass
                             elif player2.player_id in [100, 101, 102]:
@@ -240,12 +240,26 @@ class Action():
                                 await dm_print(player2.player_id, "The other mason is {}".format(player1.nickname))
             return player_list
         elif self.type == 'prompt_drunk':
-            
-            return
+            for card in player_list:
+                if card.player_id == self.picked_card_id:
+                    temp = player.role
+                    player.role = self.player.role
+                    self.player.role = temp
+            ### td: inform drunk of successful operation
+            return player_list
+
         elif self.type == 'see_player':
-            return
+            for player in player_list:
+                if self.seen_player == player.nick:
+                    await dm_print(self.player.player_id, "Your chosen player is a {}".format(player.role))
+            return player_list
+
         elif self.type == 'see_cards':
-            return
+            for card in player_list:
+                if card.player_id in [100, 101]:
+                    await dm_print(self.player.player_id, "One card is a {}".format(card.role))
+            return player_list
+            
         else:
             raise("Action not found '{}'.".format(self.type))
 
@@ -255,8 +269,12 @@ def execute_actions(action_type, action_list, player_list):
         if action_type == action.type:
             player_list = action.execute(player_list)
     return player_list
+<<<<<<< HEAD
 ### Executes all actions in order
 def execute_all(action_list, player_list):
+=======
+
+>>>>>>> b8cc4b455ba489e8cf8b4a172ffc47a1319b1574
 
 gm_id = 268834601466593280
 global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'robber', 'seer', 'drunk', 'hunter', 'minion']
