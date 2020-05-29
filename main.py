@@ -60,7 +60,7 @@ class Action():
 
         ### troublemaker action input
         if player.role == 'troublemaker':
-            self.type = 'swap'
+            self.type = 'troublemaker_swap'
             prompt = "Which two players would you like to swap? (comma separated)"
 
             def get_troublemaker_input(prompt, nick_list, player_id):
@@ -78,12 +78,12 @@ class Action():
                 else:
                     prompt = "Please input two players and try again."
                     return get_troublemaker_input(prompt, nick_list)
-                ### Nice recursion 
+                ### Nice recursion
 
             self.player_swap_list = get_troublemaker_input(prompt, self.nick_list, self.player_id)
 
         elif player.role == 'robber':
-            self.type = 'swap'
+            self.type = 'robber_swap'
             self.player_swap_list = []
             self.player_swap_list.append(player.nickname)
             prompt = "Enter a player to steal their role."
@@ -154,22 +154,12 @@ class Action():
 
     #def execute(self, player_list)
 
-### Takes an action list and a player list and executes the actions in order.
-def execute_Actions(action_list, player_list):
-    ### Construct dict of role:action
-
-
-    ### Construct dict of nickname:player
-
-    ### Call actions in order:
-    # - werewolves
-    # - minion
-    # - masons
-    # - seer
-    # - robber
-    # - troublemaker
-    # - drunk
-    # - insomniac
+### Takes a list of actions then executes the ones of the given type
+def execute_actions(action_type, action_list, player_role_dict):
+    for action in action_list:
+        if action_type == action.type:
+            player_list = action.execute(player_role_dict)
+    return player_list
 
 
 gm_id = 268834601466593280
