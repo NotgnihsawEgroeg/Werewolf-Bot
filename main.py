@@ -118,6 +118,8 @@ class Action():
 
         elif player.role == 'minion':
             self.type = 'inform_minion'
+            for player in player_list:
+                
 
         elif player.role == 'drunk':
             self.type = 'prompt_drunk'
@@ -257,7 +259,7 @@ class Action():
                 if card.player_id in [100, 101]:
                     await dm_print(self.player.player_id, "One card is a {}".format(card.role))
             return player_list
-            
+
         else:
             raise("Action not found '{}'.".format(self.type))
 
@@ -267,8 +269,21 @@ def execute_actions(action_type, action_list, player_list):
         if action_type == action.type:
             player_list = action.execute(player_list)
     return player_list
+<<<<<<< HEAD
+
+<<<<<<< HEAD
 ### Executes all actions in order
 def execute_all(action_list, player_list):
+    player_list = execute_actions('inform_were', action_list, player_list)
+    player_list = execute_actions('')
+
+=======
+
+>>>>>>> b8cc4b455ba489e8cf8b4a172ffc47a1319b1574
+=======
+### Executes all actions in order
+def execute_all(action_list, player_list):
+>>>>>>> 374d9d3e3dc90f74fa8671b80e3520ffe6be453c
 
 gm_id = 268834601466593280
 global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'robber', 'seer', 'drunk', 'hunter', 'minion']
