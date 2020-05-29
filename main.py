@@ -34,7 +34,7 @@ async def get_nicks(user_ids):
             nick = 'Middle Card {}'.format(user_ids[i] - 99)
         else:
             nick = 'Player' + str(user_ids[i])
-            #nick = await dm_input(user_ids[i], 'Enter your desired nickname for this game of werewolf. ')
+            nick = await dm_input(user_ids[i], 'Enter your desired nickname for this game of werewolf. ')
         nicknames.append(nick)
 
     nick_dict = dict(zip(user_ids, nicknames))
@@ -56,7 +56,7 @@ def get_player_from_nick(nickname, player_list):
 ### Night Action class
 
 class Action():
-    async def __init__(self, player, player_list):
+    async def get_actions(self, player, player_list):
         self.player = player
 
         ### Constructs nick list for swaps
@@ -80,13 +80,17 @@ class Action():
                         return input_list
                     else:
                         prompt = "Player not found. Please try again."
-                        return get_troublemaker_input(prompt, nick_list, player_id)
+                        troub_input = await get_troublemaker_input(prompt, nick_list, player_id)
+                        return troub_input
+                        
                 else:
                     prompt = "Please input two players and try again."
-                    return get_troublemaker_input(prompt, nick_list)
+                    troub_input = await get_troublemaker_input(prompt, nick_list)
+                    return troub_input
                 ### Nice recursion
 
-            self.player_swap_list = get_troublemaker_input(prompt, self.nick_list, self.player_id)
+            troub_input = await get_troublemaker_input(prompt, self.nick_list, self.player.player_id)
+            self.player_swap_list = troub_input
 
         elif player.role == 'robber':
             self.type = 'robber_swap'
@@ -100,9 +104,11 @@ class Action():
                     return temp_input
                 else:
                     prompt = "Player not found. Please try again."
-                    return get_robber_input(prompt, nick_list, player_id)
+                    rob_input = await get_robber_input(prompt, nick_list, player_id)
+                    return rob_input
 
-            self.player_swap_list.append(get_robber_input(prompt, self.nick_list, self.player_id))
+            rob_input = await get_robber_input(prompt, self.nick_list, self.player.player_id)
+            self.player_swap_list.append(rob_input)
 
         elif player.role == 'insomniac':
             self.type = 'inform_insom'
@@ -130,7 +136,8 @@ class Action():
                     temp_input = int(temp_input)
                 except ValueError:
                     prompt = "A NUMBER, in base 10, 1 through 3, dummy. Try again."
-                    return get_drunk_card_id(player_id, prompt)
+                    drunk_card = await get_drunk_card_id(player_id, prompt)
+                    return drunk_card
                 except:
                     print("Unexpected error picking drunk card.")
                     raise
@@ -140,9 +147,10 @@ class Action():
                     return (temp_input + 99)
                 else:
                     prompt = "The card number must be between 1 and 3. Try again."
-                    return get_drunk_card_id(prompt, player_id)
+                    drunk_card = await get_drunk_card_id(prompt, player_id)
+                    return drunk_card
 
-            self.picked_card_id = get_drunk_card_id(prompt, player.player_id)
+            self.picked_card_id = await get_drunk_card_id(prompt, self.player.player_id)
 
         elif player.role == 'seer':
             prompt = "Would you like to see two cards (type 'cards') or a player (type 'player')?"
@@ -158,7 +166,8 @@ class Action():
                         return seer_action_dict
                     else:
                         prompt = "Player not found, please try again. (type 'cards' or 'player')"
-                        return get_seer_input(prompt, player_list, player_id)
+                        seer_input = await get_seer_input(prompt, player_list, player_id)
+                        return seer_input
                 elif input == 'cards':
                     message = 'Input accepted!'
                     await dm_print(player_id, message)
@@ -166,9 +175,10 @@ class Action():
                     return seer_action_dict
                 else:
                     prompt = "Not a valid option. Please try again."
-                    return get_seer_input(prompt)
+                    seer_input = await get_seer_input(prompt)
+                    return seer_input
 
-            seer_dict = get_seer_input(prompt, self.nick_list, player.player_id)
+            seer_dict = await get_seer_input(prompt, self.nick_list, self.player.player_id)
             self.type = seer_dict['type']
             self.seen_player = seer_dict['player']
 
@@ -327,10 +337,14 @@ async def on_message(message):
         ### GM decides who's playing.
         player_ids_str = await dm_input(gm_id, "Enter comma separated player ids. ")
         player_ids_str = player_ids_str.replace(' ', '')
-        player_ids = player_ids_str.split(',')
+        #player_ids = player_ids_str.split(',')
+        player_ids = [267747233837875200,296686334532255744,317382944501137409,310950726178177025]
         #player_ids = list(range(len(global_roles)))
         ### 100, 101, and 102 are the middle cards.
         player_ids.extend([100, 101, 102])
+
+        nickname_dict = await get_nicks(player_ids)
+        await dm_print(gm_id, 'players are: {}'.format(nickname_dict))
 
         ### Manual role prompt
         manual_roles = False
@@ -347,6 +361,7 @@ async def on_message(message):
                 roles_str = await dm_input(gm_id, "Role options include: {}. Enter comma separated roles you would like to include. Must include {} roles. ".format(global_roles, len(player_ids)))
                 roles_str.replace(' ', '')
                 roles = roles_str.split(',')
+                #roles = ['mason', 'robber', 'seer','drunk', 'hunter','werewolf', 'minion']
                 #global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'robber', 'seer', 'drunk', 'hunter', 'minion']
                 decided_str = await dm_input(gm_id, "Your roles are: {}. Is this ok? (Y/N) ".format(roles))
                 if decided_str == 'Y' and len(roles) == len(player_ids) and validate_roles(roles, global_roles):
@@ -358,7 +373,7 @@ async def on_message(message):
 
             random.shuffle(roles)
         #player_dict = dict(zip(player_ids, roles))
-        nickname_dict = await get_nicks(player_ids)
+
         if manual_roles == True:
             nicknames = list(nickname_dict.values())
             decided = False
@@ -400,9 +415,11 @@ async def on_message(message):
         ### Night Actions Here
         action_list = []
         for p in player_list:
-            action_list.append(Action(p, player_list))
+            a = Action()
+            intent = await a.get_actions(p, player_list)
+            action_list.append(intent)
 
-        execute_all(action_list, player_list)
+        await execute_all(action_list, player_list)
 
         ### After Night Actions, have a 10 minute wait period with warnings.
         await message.channel.send('Everybody wake up and begin discussion. You have 10 minutes.')
@@ -425,9 +442,12 @@ async def on_message(message):
         ### Voting
         deaths = []
 
-        player_nicks_vote = [0] * len(player_list)
+        player_nicks_vote = [0] * (len(player_list) - 3)
         for i in range(len(player_list)):
-            player_nicks_vote[i] = player_list[i].nickname
+            if player_list[i].player_id == 100 or player_list[i].player_id == 101 or player_list[i].player_id == 102:
+                pass
+            else:
+                player_nicks_vote[i] = player_list[i].nickname
 
         vote_dict = dict(zip(player_nicks_vote, [0 for j in range(len(player_nicks_vote))]))
         for i in range(len(player_list)):
