@@ -198,10 +198,8 @@ class Action():
             return
 
         elif self.type == 'inform_insom':
-            for player in player_list:
-                if player.role == 'insomniac':
-                    message = "You are currently the insomniac."
-                    await dm_print(player.player_id, message)
+            message = 'Your current role is {}'.format(player.role)
+            await dm_print(player.player_id, message)
             return player_list
 
         elif self.type == 'inform_were':
@@ -307,8 +305,8 @@ async def on_message(message):
         ### GM decides who's playing.
         player_ids_str = await dm_input(gm_id, "Enter comma separated player ids. ")
         player_ids_str = player_ids_str.replace(' ', '')
-        #player_ids = split(',', player_ids_str)
-        player_ids = list(range(len(global_roles)))
+        player_ids = split(',', player_ids_str)
+        #player_ids = list(range(len(global_roles)))
         ### 100, 101, and 102 are the middle cards.
         player_ids.extend([100, 101, 102])
 
@@ -377,7 +375,7 @@ async def on_message(message):
                 pass
             else:
                 print(player_list[i])
-                #await dm_print(player_list[i].player_id, 'Your starting role is {}. Good Luck!'.format(player_list[i].role))
+                await dm_print(player_list[i].player_id, 'Your starting role is {}. Good Luck!'.format(player_list[i].role))
                 pass
 
         ### Night Actions Here
