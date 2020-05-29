@@ -293,21 +293,17 @@ GUILD = os.getenv('DISCORD_GUILD')
 PREFIX = str(os.getenv('PREFIX'))
 
 def validate_roles(role_list, global_roles):
-    #global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'insomniac', 'robber', 'seer', 'drunk', 'hunter', 'minion'] 
+    #global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'insomniac', 'robber', 'seer', 'drunk', 'hunter', 'minion']
     validity = 0
     print(global_roles)
-    for i in range(len(role_list)):
-        for j in range(len(global_roles)):
-            print('checking {} and {}'.format(role_list[i], global_roles[j]))
-            if role_list[i] == global_roles[j]:
-                validity += 1
-            else:
-                #print(role_list[i])
-    
+    for role in role_list:
+        if role in global_roles:
+            validity = validity + 1
+
     print(validity)
     if validity == len(role_list):
         return True
-    else: 
+    else:
         return False
 
 
