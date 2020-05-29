@@ -46,19 +46,27 @@ def format_player_list(player_list):
         string += '{} : {}\n'.format(player_list[i].nickname, player_list[i].role)
     return string
 
+
+### Night Action class
+
 class Action():
-    def __init__(self, player, player_list):
+    async def __init__(self, player, player_list):
         self.player = player
+
+        ### Constructs nick list for swaps
         self.nick_list = []
         for player_element in player_list:
             self.nick_list.append(player_element.nickname)
 
+        ### troublemaker action input
         if player.role == 'troublemaker':
             self.type = 'swap'
             prompt = "Which two players would you like to swap? (comma separated)"
+
             def get_troublemaker_input(prompt, nick_list, player_id):
                 temp_input = await dm_input(player_id, prompt)
                 input_list = temp_input.split(",")
+
                 if input_list.length() == 2:
                     input_list[0] = input_list[0].strip()
                     input_list[1] = input_list[1].strip()
@@ -70,6 +78,8 @@ class Action():
                 else:
                     prompt = "Please input two players and try again."
                     return get_troublemaker_input(prompt, nick_list)
+                ### Nice recursion 
+
             self.player_swap_list = get_troublemaker_input(prompt, self.nick_list, self.player_id)
 
         elif player.role == 'robber':
@@ -77,13 +87,15 @@ class Action():
             self.player_swap_list = []
             self.player_swap_list.append(player.nickname)
             prompt = "Enter a player to steal their role."
+
             def get_robber_input(prompt, nick_list, player_id):
-                input = await dm_input(player_id, prompt)
-                if input in nick_list:
-                    return input
+                temp_input = await dm_input(player_id, prompt)
+                if temp_input in nick_list:
+                    return temp_input
                 else:
                     prompt = "Player not found. Please try again."
                     return get_robber_input(prompt, nick_list, player_id)
+
             self.player_swap_list.append(get_robber_input(prompt, self.nick_list, self.player_id))
 
         elif player.role == 'insomniac':
@@ -101,10 +113,11 @@ class Action():
         elif player.role == 'drunk':
             self.type = 'prompt_drunk'
             prompt = "Pick a number, 1 through 3."
+
             def get_drunk_card_id(prompt, player_id):
-                input = await dm_input(player_id, prompt)
+                temp_input = await dm_input(player_id, prompt)
                 try:
-                    input = int(input)
+                    temp_input = int(temp_input)
                 except ValueError:
                     prompt = "A NUMBER, in base 10, 1 through 3, dummy. Try again."
                     return get_drunk_card_id(player_id, prompt)
@@ -112,8 +125,9 @@ class Action():
                     print("Unexpected error picking drunk card.")
                     raise
 
-                if input < 4 && input > 0:
-                    return ((input - 1) + 100)
+                ### return id of center card (100-102)
+                if temp_input < 4 and temp_input > 0:
+                    return (temp_input + 99)
                 else:
                     prompt = "The card number must be between 1 and 3. Try again."
                     return get_drunk_card_id(prompt, player_id)
@@ -138,9 +152,24 @@ class Action():
 
             self.type = get_seer_input(prompt)
 
+    #def execute(self, player_list)
+
+### Takes an action list and a player list and executes the actions in order.
+def execute_Actions(action_list, player_list):
+    ### Construct dict of role:action
 
 
-    def execute(self, player_list)
+    ### Construct dict of nickname:player
+
+    ### Call actions in order:
+    # - werewolves
+    # - minion
+    # - masons
+    # - seer
+    # - robber
+    # - troublemaker
+    # - drunk
+    # - insomniac
 
 
 gm_id = 268834601466593280
