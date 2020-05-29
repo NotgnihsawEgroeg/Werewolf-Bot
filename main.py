@@ -154,12 +154,32 @@ class Action():
 
     #def execute(self, player_list)
 
+<<<<<<< HEAD
 ### Takes a list of actions then executes the ones of the given type
 def execute_actions(action_type, action_list, player_role_dict):
     for action in action_list:
         if action_type == action.type:
             player_list = action.execute(player_role_dict)
     return player_list
+=======
+### Takes an action list and a player list and executes the actions in order.
+def execute_Actions(action_list, player_list):
+    ### Construct dict of nickname:player
+    nicks = []
+    for p in player_list:
+        nicks.append(p.nickname)
+    nick_dict = dict(zip(nicks, player_list))
+
+    ### Call actions in order:
+    # - werewolves
+    # - minion
+    # - masons
+    # - seer
+    # - robber
+    # - troublemaker
+    # - drunk
+    # - insomniac
+>>>>>>> fb2e0cab1fd2aa5430361d0aecf6ede272bf0af4
 
 
 gm_id = 268834601466593280
