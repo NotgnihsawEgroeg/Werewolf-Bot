@@ -119,7 +119,7 @@ class Action():
         elif player.role == 'minion':
             self.type = 'inform_minion'
             for player in player_list:
-                
+
 
         elif player.role == 'drunk':
             self.type = 'prompt_drunk'
@@ -269,20 +269,21 @@ def execute_actions(action_type, action_list, player_list):
         if action_type == action.type:
             player_list = action.execute(player_list)
     return player_list
-<<<<<<< HEAD
 
 <<<<<<< HEAD
 ### Executes all actions in order
 def execute_all(action_list, player_list):
     player_list = execute_actions('inform_were', action_list, player_list)
-    player_list = execute_actions('')
+    player_list = execute_actions('inform_minion', action_list, player_list)
+    player_list = execute_actions('inform_mason', action_list, player_list)
+    player_list = execute_actions('see_player', action_list, player_list)
+    player_list = execute_actions('see_cards', action_list, player_list)
+    player_list = execute_actions('robber_swap', action_list, player_list)
+    player_list = execute_actions('troublemaker_swap', action_list, player_list)
+    player_list = execute_actions('prompt_drunk')
 
-=======
-
->>>>>>> b8cc4b455ba489e8cf8b4a172ffc47a1319b1574
 =======
 ### Executes all actions in order
-def execute_all(action_list, player_list):
 >>>>>>> 374d9d3e3dc90f74fa8671b80e3520ffe6be453c
 
 gm_id = 268834601466593280
@@ -397,7 +398,7 @@ async def on_message(message):
         action_list = []
         for p in player_list:
             action_list.append(Action(p, player_list))
-        
+
         execute_all(action_list, player_list)
 
         ### After Night Actions, have a 10 minute wait period with warnings.
@@ -417,7 +418,7 @@ async def on_message(message):
         '''
         await asyncio.sleep(30)
         await message.channel.send('TIME\'S UP!!! YOU MUST VOTE NOW!')
-        
+
         ### Voting
         deaths = []
 
