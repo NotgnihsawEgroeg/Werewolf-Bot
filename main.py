@@ -200,18 +200,16 @@ class Action():
             return
 
         elif self.type == 'inform_insom':
-            for player in player_list:
-                if player.role == 'insomniac':
-                    message = "You are currently the insomniac."
-                    await dm_print(player.player_id, message)
+            message = 'Your current role is {}'.format(player.role)
+            await dm_print(player.player_id, message)
             return player_list
 
         elif self.type == 'inform_were':
             for player1 in player_list:
-                if player1.role == 'werewolf' && player1.were_check == False:
+                if player1.role == 'werewolf' and player1.were_check == False:
                     player1.werecheck = True
                     for player2 in player_list:
-                        if player2.role == 'werewolf' && player2.were_check == False:
+                        if player2.role == 'werewolf' and player2.were_check == False:
                             if player1.player_id in [100, 101, 102] and player2.player_id in [100, 101, 102]:
                                 pass
                             elif player2.player_id in [100, 101, 102]:
@@ -227,10 +225,10 @@ class Action():
             return
         elif self.type == 'inform_mason':
             for player1 in player_list:
-                if player1.role == 'mason' && player1.check == False:
+                if player1.role == 'mason' and player1.check == False:
                     player1.check = True
                     for player2 in player_list:
-                        if player2.role == 'mason' && player2.check == False:
+                        if player2.role == 'mason' and player2.check == False:
                             if player1.player_id in [100, 101, 102] and player2.player_id in [100, 101, 102]:
                                 pass
                             elif player2.player_id in [100, 101, 102]:
@@ -271,6 +269,7 @@ def execute_actions(action_type, action_list, player_list):
         if action_type == action.type:
             player_list = action.execute(player_list)
     return player_list
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 ### Executes all actions in order
@@ -281,6 +280,10 @@ def execute_all(action_list, player_list):
 =======
 
 >>>>>>> b8cc4b455ba489e8cf8b4a172ffc47a1319b1574
+=======
+### Executes all actions in order
+def execute_all(action_list, player_list):
+>>>>>>> 374d9d3e3dc90f74fa8671b80e3520ffe6be453c
 
 gm_id = 268834601466593280
 global_roles = ['villager', 'werewolf', 'mason', 'troublemaker', 'robber', 'seer', 'drunk', 'hunter', 'minion']
@@ -317,8 +320,8 @@ async def on_message(message):
         ### GM decides who's playing.
         player_ids_str = await dm_input(gm_id, "Enter comma separated player ids. ")
         player_ids_str = player_ids_str.replace(' ', '')
-        #player_ids = split(',', player_ids_str)
-        player_ids = list(range(len(global_roles)))
+        player_ids = split(',', player_ids_str)
+        #player_ids = list(range(len(global_roles)))
         ### 100, 101, and 102 are the middle cards.
         player_ids.extend([100, 101, 102])
 
@@ -387,10 +390,15 @@ async def on_message(message):
                 pass
             else:
                 print(player_list[i])
-                #await dm_print(player_list[i].player_id, 'Your starting role is {}. Good Luck!'.format(player_list[i].role))
+                await dm_print(player_list[i].player_id, 'Your starting role is {}. Good Luck!'.format(player_list[i].role))
                 pass
 
         ### Night Actions Here
+        action_list = []
+        for p in player_list:
+            action_list.append(Action(p, player_list))
+        
+        execute_all(action_list, player_list)
 
         ### After Night Actions, have a 10 minute wait period with warnings.
         await message.channel.send('Everybody wake up and begin discussion. You have 10 minutes.')
@@ -406,10 +414,10 @@ async def on_message(message):
 
         await asyncio.sleep(30)
         await message.channel.send('30 Seconds left')
-
+        '''
         await asyncio.sleep(30)
         await message.channel.send('TIME\'S UP!!! YOU MUST VOTE NOW!')
-        '''
+        
         ### Voting
         deaths = []
 
