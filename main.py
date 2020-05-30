@@ -57,8 +57,10 @@ def get_player_from_nick(nickname, player_list):
 
 class Action():
     async def get_actions(self, player, player_list):
-        self.player = player
+        if player.player_id == 100 or player.player_id == 101 or player.player_id == 102:
+            self.type = 'middle_card'
 
+        self.player = player
         ### Constructs nick list for swaps
         self.nick_list = []
         for player_element in player_list:
@@ -267,6 +269,9 @@ class Action():
             for card in player_list:
                 if card.player_id in [100, 101]:
                     await dm_print(self.player.player_id, "One card is a {}".format(card.role))
+            return player_list
+        
+        elif self.type == 'middle_card':
             return player_list
 
         else:
